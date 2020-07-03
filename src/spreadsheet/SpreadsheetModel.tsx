@@ -10,7 +10,7 @@ function rowColToKey(row: number, col: number) {
     return `${row}/${col}`;
 }
 
-export default class SpreadsheetData {
+export default class SpreadsheetModel {
     rowCount: number;
     columnCount: number;
     values = new Map<string, any>();

@@ -1,11 +1,11 @@
 
 import React, { useState } from 'react'
 
-import SpreadsheetData, { Cell } from './SpreadsheetData'
+import SpreadsheetModel, { Cell } from './SpreadsheetModel'
 import styled from 'styled-components'
 
 interface Props {
-    data: SpreadsheetData
+    model: SpreadsheetModel
 }
 
 const Grid = styled.div`
@@ -29,15 +29,15 @@ function EditingCell({key}) {
       type="text" />
 }
 
-export default function SpreadsheetView({data}: Props) {
+export default function SpreadsheetView({model}: Props) {
 
     const [ editingCell, setEditingCell ] = useState(null);
 
     return <Grid
-        rowCount={data.rowCount}
-        columnCount={data.columnCount}>
+        rowCount={model.rowCount}
+        columnCount={model.columnCount}>
 
-    { Array.from(data.iterateEveryCell()).map((cell: Cell) => {
+    { Array.from(model.iterateEveryCell()).map((cell: Cell) => {
 
         if (cell.key === editingCell) {
             // This cell is currently being edited
