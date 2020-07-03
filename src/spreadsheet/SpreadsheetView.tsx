@@ -14,7 +14,7 @@ display: grid;
 
 grid-template-columns: repeat(${props => props.columnCount}, 1fr);
 grid-template-rows: repeat(${props => props.rowCount}, 1fr);
-`
+`;
 
 const CellStyle = styled.div<{row: number, col: number}>`
 padding: 10px;
@@ -23,11 +23,16 @@ grid-column: ${props => props.col + 1};
 grid-row: ${props => props.row + 1};
 `;
 
-
-
 export default function SpreadsheetView({model}: Props) {
 
-    const [ editingCell, setEditingCell ] = useState<string | null>(null);
+    const [ editingCellKey, setEditingCellKey ] = useState<string | null>(null);
+    const [ inProgressValue, setInProgressValue ] = useState<string | null>(null);
+
+    function submitCurrentEdit() {
+        model.setCell(editingCellKey as string, inProgressValue);
+        setInProgressValue(null);
+        setEditingCellKey(null);
+    }
 
     return <Grid
         rowCount={model.rowCount}
@@ -35,10 +40,13 @@ export default function SpreadsheetView({model}: Props) {
 
     { Array.from(model.iterateEveryCell()).map((cell: Cell) => {
 
-        if (cell.key === editingCell) {
+        if (cell.key === editingCellKey) {
             // This cell is currently being edited
             return <EditingCell
-                key={cell.key}
+                cellkey={cell.key}
+                value={inProgressValue as string}
+                onChange={(val) => setInProgressValue(val)}
+                onSubmit={submitCurrentEdit}
             />
         }
 
@@ -47,10 +55,14 @@ export default function SpreadsheetView({model}: Props) {
           row={cell.row}
           col={cell.col}
           onClick={() => {
-            if (editingCell)
-                setEditingCell(null);
-            else
-                setEditingCell(cell.key);
+            if (editingCellKey) {
+                // Already editing a cell, so submit the current edit.
+                submitCurrentEdit();
+            } else {
+                // Start editing this cell
+                setEditingCellKey(cell.key);
+                setInProgressValue(cell.value);
+            }
           }}
         >{cell.value}</CellStyle>
     })}

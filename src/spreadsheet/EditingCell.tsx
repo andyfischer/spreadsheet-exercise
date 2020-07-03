@@ -1,12 +1,26 @@
 
-import React from 'react'
+import React, { useState } from 'react'
 
 interface Props {
-    key: string
+    cellkey: string
+    value: string
+    onChange: (value: string) => void
+    onSubmit: () => void
 }
 
-export default function EditingCell({key}: Props) {
+export default function EditingCell({cellkey, value, onChange, onSubmit}: Props) {
+
     return <input
-      key={key}
-      type="text" />
+      autoFocus
+      key={cellkey}
+      type="text"
+      value={value}
+      onChange={(evt) => {
+          onChange(evt.target.value);
+      }}
+      onKeyPress={(evt) => {
+          if (evt.key === 'Enter')
+              onSubmit();
+      }}
+      />
 }

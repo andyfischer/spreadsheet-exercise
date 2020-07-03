@@ -24,8 +24,12 @@ export default class SpreadsheetModel {
         return this.values.get(rowColToKey(row, col));
     }
 
-    setValue(row: number, col: number, value: any) {
+    setRowCol(row: number, col: number, value: any) {
         return this.values.set(rowColToKey(row, col), value);
+    }
+
+    setCell(cellkey: string, value: any) {
+        this.values.set(cellkey, value);
     }
 
     *iterateEveryCell(): Iterable<Cell> {
