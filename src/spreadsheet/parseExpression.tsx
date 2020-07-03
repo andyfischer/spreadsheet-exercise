@@ -134,6 +134,9 @@ function parseAtom(parser: Parser): AST | null {
 }
 
 function parseFoundExpression(parser: Parser, left: AST, callback): AST {
+    // skip over the operator we just found
+    parser.advance();
+
     const right = parseInfixExpression(parser);
     if (!right) {
         return {
@@ -160,11 +163,19 @@ function parseInfixExpression(parser: Parser): AST | null {
     parser.skipSpaces();
 
     const next = parser.next();
-    if (next == '+') {
-        console.log('found +');
-        parser.advance();
+
+    switch (next) {
+    case '+':
         result = parseFoundExpression(parser, result, (a,b) => a + b);
-        console.log('result after +', result);
+        break;
+    case '-':
+        result = parseFoundExpression(parser, result, (a,b) => a - b);
+        break;
+    case '*':
+        result = parseFoundExpression(parser, result, (a,b) => a * b);
+        break;
+    case '/': result = parseFoundExpression(parser, result, (a,b) => a / b);
+        break;
     }
 
     return result;
