@@ -148,6 +148,8 @@ export default class SpreadsheetModel {
                 this.setCell(cell.key, cell.source);
             }
 
+            console.log('Loaded from localStorage', this);
+
             return true;
 
         } catch (e) {
@@ -163,7 +165,7 @@ export default class SpreadsheetModel {
                     columnCount: this.columnCount,
                     rowCount: this.rowCount,
                     cells: Array.from(this.iterateEveryCell())
-                })
+                });
             } catch (e) {
                 console.error(e);
             }

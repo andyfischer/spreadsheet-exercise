@@ -9,6 +9,7 @@ import Image from "../components/image"
 import SEO from "../components/seo"
 
 let spreadsheetModel = initializeSpreadsheet({useLocalStorage: true});
+spreadsheetModel.saveToLocalStorage = true;
 
 const IndexPage = () => {
     const [ modelVer, setModelVer ] = useState(0);
