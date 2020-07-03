@@ -1,15 +1,37 @@
 
 import React from 'react'
 
-import SpreadsheetData from './SpreadsheetData'
+import SpreadsheetData, { Cell } from './SpreadsheetData'
+import styled from 'styled-components'
 
 interface Props {
     data: SpreadsheetData
 }
 
+const Grid = styled.div`
+display: grid;
+
+grid-template-columns: repeat(${props => props.columnCount}, 1fr);
+grid-template-rows: repeat(${props => props.rowCount}, 1fr);
+`
+
+const CellStyle = styled.div`
+padding: 10px;
+border: 1px solid #ddd;
+grid-column: ${props => props.col + 1};
+grid-row: ${props => props.row + 1};
+`
+
 export default function SpreadsheetView({data}: Props) {
 
-    return <div />
+    return <Grid rowCount={data.rowCount} columnCount={data.columnCount}>
+    { Array.from(data.iterateEveryCell()).map((cell: Cell) =>
+      <CellStyle
+        row={cell.row}
+        col={cell.col}
+      >{cell.value}</CellStyle>
+    )}
+    </Grid>
 }
 
 /*
