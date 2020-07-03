@@ -1,7 +1,15 @@
 
 import React from 'react'
 
-export default function Spreadsheet() {
+import SpreadsheetData from './SpreadsheetData'
+
+interface Props {
+    data: SpreadsheetData
+}
+
+export default function SpreadsheetView({data}: Props) {
+
+    return <div />
 }
 
 /*
