@@ -1,34 +1,21 @@
-
-export interface Cell {
-    key: string
-    row: number
-    col: number
-    value: any
-}
-
-function rowColToKey(row: number, col: number) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+function rowColToKey(row, col) {
     return `${row}/${col}`;
 }
-
-export default class SpreadsheetModel {
-    rowCount: number;
-    columnCount: number;
-    values = new Map<string, any>();
-
-    constructor(rowCount: number, columnCount: number) {
+class SpreadsheetModel {
+    constructor(rowCount, columnCount) {
+        this.values = new Map();
         this.rowCount = rowCount;
         this.columnCount = columnCount;
     }
-
-    getValue(row: number, col: number) {
+    getValue(row, col) {
         return this.values.get(rowColToKey(row, col));
     }
-
-    setValue(row: number, col: number, value: any) {
+    setValue(row, col, value) {
         return this.values.set(rowColToKey(row, col), value);
     }
-
-    *iterateEveryCell(): Iterable<Cell> {
+    *iterateEveryCell() {
         for (let col = 0; col < this.columnCount; col++) {
             for (let row = 0; row < this.rowCount; row++) {
                 yield {
@@ -36,8 +23,10 @@ export default class SpreadsheetModel {
                     row,
                     col,
                     value: this.getValue(row, col)
-                }
+                };
             }
         }
     }
 }
+exports.default = SpreadsheetModel;
+//# sourceMappingURL=SpreadsheetModel.js.map

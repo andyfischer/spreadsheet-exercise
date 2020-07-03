@@ -2,20 +2,21 @@
 import React, { useState } from 'react'
 
 import SpreadsheetModel, { Cell } from './SpreadsheetModel'
+import EditingCell from './EditingCell'
 import styled from 'styled-components'
 
 interface Props {
     model: SpreadsheetModel
 }
 
-const Grid = styled.div`
+const Grid = styled.div<{rowCount: number, columnCount: number}>`
 display: grid;
 
 grid-template-columns: repeat(${props => props.columnCount}, 1fr);
 grid-template-rows: repeat(${props => props.rowCount}, 1fr);
 `
 
-const CellStyle = styled.div`
+const CellStyle = styled.div<{row: number, col: number}>`
 padding: 10px;
 border: 1px solid #ddd;
 grid-column: ${props => props.col + 1};
@@ -23,15 +24,10 @@ grid-row: ${props => props.row + 1};
 `;
 
 
-function EditingCell({key}) {
-    return <input
-      key={key}
-      type="text" />
-}
 
 export default function SpreadsheetView({model}: Props) {
 
-    const [ editingCell, setEditingCell ] = useState(null);
+    const [ editingCell, setEditingCell ] = useState<string | null>(null);
 
     return <Grid
         rowCount={model.rowCount}

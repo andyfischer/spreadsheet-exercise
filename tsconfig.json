@@ -1,0 +1,30 @@
+{
+    "compilerOptions": {
+        "lib": ["es2017", "dom"],
+        "target": "es6",
+        "module": "commonjs",
+        "outDir": "dist",
+        "rootDir": "src",
+        "moduleResolution": "node",
+        "isolatedModules": false,
+        "jsx": "react",
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "declaration": false,
+        "removeComments": true,
+        "sourceMap": true,
+        "noLib": false,
+        "preserveConstEnums": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "strict": true,
+        "noImplicitAny": false
+    },
+    "include": [
+        "src/**/*ts",
+        "src/**/*tsx"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
+}
