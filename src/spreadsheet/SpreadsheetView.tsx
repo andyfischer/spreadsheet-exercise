@@ -61,10 +61,10 @@ export default function SpreadsheetView({model}: Props) {
             } else {
                 // Start editing this cell
                 setEditingCellKey(cell.key);
-                setInProgressValue(cell.value);
+                setInProgressValue(cell.source);
             }
           }}
-        >{cell.value}</CellStyle>
+        >{cell.derived}</CellStyle>
     })}
 
     </Grid>

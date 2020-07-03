@@ -3,7 +3,8 @@ export interface Cell {
     key: string
     row: number
     col: number
-    value: any
+    source: any
+    derived: any
 }
 
 function rowColToKey(row: number, col: number) {
@@ -13,33 +14,56 @@ function rowColToKey(row: number, col: number) {
 export default class SpreadsheetModel {
     rowCount: number;
     columnCount: number;
-    values = new Map<string, any>();
+    sourceValues = new Map<string, any>();
+    derivedValues = new Map<string, any>();
 
     constructor(rowCount: number, columnCount: number) {
         this.rowCount = rowCount;
         this.columnCount = columnCount;
     }
 
-    getValue(row: number, col: number) {
-        return this.values.get(rowColToKey(row, col));
+    getSource(cellkey: string) {
+        return this.sourceValues.get(cellkey);
+    }
+
+    getDerived(cellkey: string) {
+        let derived = this.derivedValues.get(cellkey);
+        if (derived != null)
+            return derived;
+
+        // Need to compute the derived value.
+        const source = this.sourceValues.get(cellkey);
+
+        // TODO: Check if this is an expression
+
+        derived = source;
+        this.derivedValues.set(cellkey, derived);
+        return derived;
     }
 
     setRowCol(row: number, col: number, value: any) {
-        return this.values.set(rowColToKey(row, col), value);
+        this.setCell(rowColToKey(row, col), value);
     }
 
     setCell(cellkey: string, value: any) {
-        this.values.set(cellkey, value);
+        this.sourceValues.set(cellkey, value);
+
+        // Throw away all derived values every time there is a change.
+        // Future: Would be more efficient if we did dependency tracking
+        // and only recomputed cells that were affected by this change.
+        this.derivedValues = new Map();
     }
 
     *iterateEveryCell(): Iterable<Cell> {
         for (let col = 0; col < this.columnCount; col++) {
             for (let row = 0; row < this.rowCount; row++) {
+                const key = rowColToKey(row, col);
                 yield {
-                    key: rowColToKey(row, col),
+                    key,
                     row,
                     col,
-                    value: this.getValue(row, col)
+                    source: this.getSource(key),
+                    derived: this.getDerived(key)
                 }
             }
         }
