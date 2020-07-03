@@ -33,10 +33,23 @@ export default class SpreadsheetModel {
             case 'ref':
                 return this.getDerived(ast.ref);
 
-            case 'expression':
-                return ast.callback(this.evaluateExpression(ast.left),
-                                    this.evaluateExpression(ast.right));
+            case 'expression': {
+                const left = parseInt(this.evaluateExpression(ast.left), 10);
+                const right = parseInt(this.evaluateExpression(ast.right), 10);
+                if (left === '#error' || right === '#error')
+                    return '#error'
+                const result = ast.callback(left, right);
+                if (!isFinite(result))
+                    return '#error'
+                return result;
+            }
+
+            case 'error':
+                return '#error'
         }
+
+        console.log('unhandled AST node: ', ast);
+        return '#error';
     }
 
     getDerived(cellkey: string) {
@@ -48,8 +61,9 @@ export default class SpreadsheetModel {
         const source = this.sourceValues.get(cellkey);
 
         // Check if this is an expression
-        if (source[0] === '=') {
-            derived = parseExpression(source.slice(1));
+        if (source != null && source[0] === '=') {
+            const expr = parseExpression(source.slice(1));
+            derived = this.evaluateExpression(expr);
         } else {
             derived = source;
         }
@@ -86,3 +100,16 @@ export default class SpreadsheetModel {
         }
     }
 }
+
+// Low budget unit testing
+function expectEquals(a,b) {
+    if (a !== b)
+        throw new Error(`expected ${a} === ${b}`);
+}
+
+const testModel = new SpreadsheetModel();
+testModel.setCell('A1', 2);
+testModel.setCell('A2', 3);
+testModel.setCell('A3', '=A1 + A2');
+console.log('result: ', testModel.getDerived('A3'))
+expectEquals(testModel.getDerived('A3'), 5);
