@@ -45,8 +45,8 @@ export default function SpreadsheetView({model}: Props) {
     }
 
     return <Grid
-        rowCount={model.rowCount}
-        columnCount={model.columnCount}>
+        rowCount={model.rowCount || 0}
+        columnCount={model.columnCount || 0}>
 
         <CellStyle
             row={0}
