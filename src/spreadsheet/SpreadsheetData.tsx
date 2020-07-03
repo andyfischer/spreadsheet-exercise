@@ -1,8 +1,13 @@
 
 export interface Cell {
+    key: string
     row: number
     col: number
     value: any
+}
+
+function rowColToKey(row: number, col: number) {
+    return `${row}/${col}`;
 }
 
 export default class SpreadsheetData {
@@ -15,20 +20,19 @@ export default class SpreadsheetData {
         this.columnCount = columnCount;
     }
 
-    getValue(row: number, col: number, ) {
-        const key = `${row}/${col}`
-        return this.values.get(key);
+    getValue(row: number, col: number) {
+        return this.values.get(rowColToKey(row, col));
     }
 
     setValue(row: number, col: number, value: any) {
-        const key = `${row}/${col}`
-        return this.values.set(key, value);
+        return this.values.set(rowColToKey(row, col), value);
     }
 
     *iterateEveryCell(): Iterable<Cell> {
         for (let col = 0; col < this.columnCount; col++) {
             for (let row = 0; row < this.rowCount; row++) {
                 yield {
+                    key: rowColToKey(row, col),
                     row,
                     col,
                     value: this.getValue(row, col)

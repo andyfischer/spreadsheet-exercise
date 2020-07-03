@@ -1,5 +1,5 @@
 
-import React from 'react'
+import React, { useState } from 'react'
 
 import SpreadsheetData, { Cell } from './SpreadsheetData'
 import styled from 'styled-components'
@@ -20,17 +20,45 @@ padding: 10px;
 border: 1px solid #ddd;
 grid-column: ${props => props.col + 1};
 grid-row: ${props => props.row + 1};
-`
+`;
+
+
+function EditingCell({key}) {
+    return <input
+      key={key}
+      type="text" />
+}
 
 export default function SpreadsheetView({data}: Props) {
 
-    return <Grid rowCount={data.rowCount} columnCount={data.columnCount}>
-    { Array.from(data.iterateEveryCell()).map((cell: Cell) =>
-      <CellStyle
-        row={cell.row}
-        col={cell.col}
-      >{cell.value}</CellStyle>
-    )}
+    const [ editingCell, setEditingCell ] = useState(null);
+
+    return <Grid
+        rowCount={data.rowCount}
+        columnCount={data.columnCount}>
+
+    { Array.from(data.iterateEveryCell()).map((cell: Cell) => {
+
+        if (cell.key === editingCell) {
+            // This cell is currently being edited
+            return <EditingCell
+                key={cell.key}
+            />
+        }
+
+        return <CellStyle
+          key={cell.key}
+          row={cell.row}
+          col={cell.col}
+          onClick={() => {
+            if (editingCell)
+                setEditingCell(null);
+            else
+                setEditingCell(cell.key);
+          }}
+        >{cell.value}</CellStyle>
+    })}
+
     </Grid>
 }
 
