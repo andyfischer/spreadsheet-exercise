@@ -8,9 +8,10 @@ import Layout from "../components/layout"
 import Image from "../components/image"
 import SEO from "../components/seo"
 
+let spreadsheetModel = initializeSpreadsheet({useLocalStorage: true});
+
 const IndexPage = () => {
     const [ modelVer, setModelVer ] = useState(0);
-    let spreadsheetModel = initializeSpreadsheet({useLocalStorage: true});
 
   return <Layout>
     <h1>Spreadsheet demo</h1>
@@ -20,7 +21,7 @@ const IndexPage = () => {
      />
 
     <button onClick={() => {
-        spreadsheetModel = initializeSpreadsheet({useLocalStorage: false});
+        spreadsheetModel.resetToFakeData();
         setModelVer(modelVer + 1);
     }}>Reset</button>
 

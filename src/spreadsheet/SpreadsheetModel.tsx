@@ -1,6 +1,7 @@
 
 import rowColToCellKey from './rowColToCellKey'
 import parseExpression, { AST, Literal, Ref, Expression } from './parseExpression'
+import initFakeData from './initFakeData'
 
 export interface Cell {
     key: string
@@ -26,6 +27,18 @@ export default class SpreadsheetModel {
     constructor(rowCount: number, columnCount: number) {
         this.rowCount = rowCount;
         this.columnCount = columnCount;
+    }
+
+    reset() {
+        this.sourceValues = new Map();
+        this.derivedValues = new Map();
+        this.afterChange();
+    }
+
+    resetToFakeData() {
+        this.reset();
+        initFakeData(this);
+        this.afterChange();
     }
 
     getSource(cellkey: string) {
@@ -128,10 +141,9 @@ export default class SpreadsheetModel {
                 return false;
 
             const savedData = JSON.parse(saved);
+            this.reset();
             this.rowCount = savedData.rowCount;
             this.columnCount = savedData.columnCount;
-            this.sourceValues = new Map();
-            this.derivedValues = new Map();
             for (const cell of savedData.cells) {
                 this.setCell(cell.key, cell.source);
             }
