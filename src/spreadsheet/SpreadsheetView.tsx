@@ -21,33 +21,65 @@ padding: 10px;
 border: 1px solid #ddd;
 grid-column: ${props => props.col + 1};
 grid-row: ${props => props.row + 1};
+
+input {
+width: 100%;
+height: 100%;
+}
 `;
 
 export default function SpreadsheetView({model}: Props) {
 
+    // State used when a cell is being edited.
     const [ editingCellKey, setEditingCellKey ] = useState<string | null>(null);
     const [ inProgressValue, setInProgressValue ] = useState<string | null>(null);
+
+    // State to help trigger re-renders when the SpreadsheetModel changes.
+    const [ modelVer, setModelVer ] = useState(1);
 
     function submitCurrentEdit() {
         model.setCell(editingCellKey as string, inProgressValue);
         setInProgressValue(null);
         setEditingCellKey(null);
+        setModelVer(modelVer + 1);
     }
 
     return <Grid
         rowCount={model.rowCount}
         columnCount={model.columnCount}>
 
+        <CellStyle
+            row={0}
+            col={ model.columnCount }
+            onClick={() => {
+                model.addColumn();
+                setModelVer(modelVer + 1);
+            }}
+        >Add Column</CellStyle>
+
+        <CellStyle
+            row={ model.rowCount }
+            col={0}
+            onClick={() => {
+                model.addRow();
+                setModelVer(modelVer + 1);
+            }}
+        >Add Row</CellStyle>
+
     { Array.from(model.iterateEveryCell()).map((cell: Cell) => {
+
+        let contents;
 
         if (cell.key === editingCellKey) {
             // This cell is currently being edited
-            return <EditingCell
+            contents = <EditingCell
                 key={cell.key}
                 value={inProgressValue as string}
                 onChange={(val) => setInProgressValue(val)}
                 onSubmit={submitCurrentEdit}
             />
+        } else {
+            contents = cell.derived;
         }
 
         return <CellStyle
@@ -56,7 +88,7 @@ export default function SpreadsheetView({model}: Props) {
           col={cell.col}
           onClick={() => {
             if (editingCellKey) {
-                // Already editing a cell, so submit the current edit.
+                // Already editing a cell, so submit it and stop editing.
                 submitCurrentEdit();
             } else {
                 // Start editing this cell
@@ -64,7 +96,7 @@ export default function SpreadsheetView({model}: Props) {
                 setInProgressValue(cell.source);
             }
           }}
-        >{cell.derived}</CellStyle>
+        >{contents}</CellStyle>
     })}
 
     </Grid>

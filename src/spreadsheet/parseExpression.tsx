@@ -174,7 +174,8 @@ function parseInfixExpression(parser: Parser): AST | null {
     case '*':
         result = parseFoundExpression(parser, result, (a,b) => a * b);
         break;
-    case '/': result = parseFoundExpression(parser, result, (a,b) => a / b);
+    case '/':
+        result = parseFoundExpression(parser, result, (a,b) => a / b);
         break;
     }
 

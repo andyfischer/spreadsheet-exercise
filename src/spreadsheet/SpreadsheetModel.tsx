@@ -13,8 +13,15 @@ export interface Cell {
 export default class SpreadsheetModel {
     rowCount: number;
     columnCount: number;
+    
+    // Source values, including expressions like "=A1 + A2"
     sourceValues = new Map<string, any>();
+
+    // Derived values, where expressions are resolved to actual numbers.
     derivedValues = new Map<string, any>();
+
+    // Whether to save to localStorage
+    saveToLocalStorage = false
 
     constructor(rowCount: number, columnCount: number) {
         this.rowCount = rowCount;
@@ -34,11 +41,12 @@ export default class SpreadsheetModel {
                 return this.getDerived(ast.ref);
 
             case 'expression': {
-                const left = parseInt(this.evaluateExpression(ast.left), 10);
-                const right = parseInt(this.evaluateExpression(ast.right), 10);
+                const left = this.evaluateExpression(ast.left);
+                const right = this.evaluateExpression(ast.right);
+                
                 if (left === '#error' || right === '#error')
                     return '#error'
-                const result = ast.callback(left, right);
+                const result = ast.callback(parseInt(left, 10), parseInt(right, 10));
                 if (!isFinite(result))
                     return '#error'
                 return result;
@@ -48,12 +56,12 @@ export default class SpreadsheetModel {
                 return '#error'
         }
 
-        console.log('unhandled AST node: ', ast);
+        console.error('unhandled AST node: ', ast);
         return '#error';
     }
 
     getDerived(cellkey: string) {
-        let derived = this.derivedValues.get(cellkey);
+        let derived: string | null = this.derivedValues.get(cellkey);
         if (derived != null)
             return derived;
 
@@ -63,7 +71,8 @@ export default class SpreadsheetModel {
         // Check if this is an expression
         if (source != null && source[0] === '=') {
             const expr = parseExpression(source.slice(1));
-            derived = this.evaluateExpression(expr);
+            if (expr)
+                derived = this.evaluateExpression(expr);
         } else {
             derived = source;
         }
@@ -83,6 +92,8 @@ export default class SpreadsheetModel {
         // Future: Would be more efficient if we did dependency tracking
         // and only recomputed cells that were affected by this change.
         this.derivedValues = new Map();
+
+        this.afterChange();
     }
 
     *iterateEveryCell(): Iterable<Cell> {
@@ -99,6 +110,53 @@ export default class SpreadsheetModel {
             }
         }
     }
+
+    addColumn() {
+        this.columnCount += 1;
+        this.afterChange();
+    }
+
+    addRow() {
+        this.rowCount += 1;
+        this.afterChange();
+    }
+
+    tryLoadFromLocalStorage(): boolean {
+        try {
+            const saved = window.localStorage.savedSpreadsheet;
+            if (!saved)
+                return false;
+
+            const savedData = JSON.parse(saved);
+            this.rowCount = savedData.rowCount;
+            this.columnCount = savedData.columnCount;
+            this.sourceValues = new Map();
+            this.derivedValues = new Map();
+            for (const cell of savedData.cells) {
+                this.setCell(cell.key, cell.source);
+            }
+
+            return true;
+
+        } catch (e) {
+            console.error(e);
+            return false;
+        }
+    }
+    
+    afterChange() {
+        if (this.saveToLocalStorage) {
+            try {
+                window.localStorage.savedSpreadsheet = JSON.stringify({
+                    columnCount: this.columnCount,
+                    rowCount: this.rowCount,
+                    cells: Array.from(this.iterateEveryCell())
+                })
+            } catch (e) {
+                console.error(e);
+            }
+        }
+    }
 }
 
 // Low budget unit testing
@@ -107,7 +165,7 @@ function expectEquals(a,b) {
         throw new Error(`expected ${a} === ${b}`);
 }
 
-const testModel = new SpreadsheetModel();
+const testModel = new SpreadsheetModel(1, 3);
 testModel.setCell('A1', 2);
 testModel.setCell('A2', 3);
 testModel.setCell('A3', '=A1 + A2');

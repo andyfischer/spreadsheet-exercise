@@ -12,7 +12,7 @@ export default function EditingCell({value, onChange, onSubmit}: Props) {
     return <input
       autoFocus
       type="text"
-      value={value}
+      value={value || ''}
       onChange={(evt) => {
           onChange(evt.target.value);
       }}
