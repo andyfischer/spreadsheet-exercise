@@ -1,14 +1,12 @@
 
+import rowColToCellKey from './rowColToCellKey'
+
 export interface Cell {
     key: string
     row: number
     col: number
     source: any
     derived: any
-}
-
-function rowColToKey(row: number, col: number) {
-    return `${row}/${col}`;
 }
 
 export default class SpreadsheetModel {
@@ -42,7 +40,7 @@ export default class SpreadsheetModel {
     }
 
     setRowCol(row: number, col: number, value: any) {
-        this.setCell(rowColToKey(row, col), value);
+        this.setCell(rowColToCellKey(row, col), value);
     }
 
     setCell(cellkey: string, value: any) {
@@ -57,7 +55,7 @@ export default class SpreadsheetModel {
     *iterateEveryCell(): Iterable<Cell> {
         for (let col = 0; col < this.columnCount; col++) {
             for (let row = 0; row < this.rowCount; row++) {
-                const key = rowColToKey(row, col);
+                const key = rowColToCellKey(row, col);
                 yield {
                     key,
                     row,
