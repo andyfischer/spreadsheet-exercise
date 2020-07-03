@@ -1,5 +1,5 @@
 
-const letterACode = 'A'.charCodeAt(0);
+const char_A = 'A'.charCodeAt(0);
 
 export default function rowColToCellKey(row: number, col: number) {
 
@@ -8,7 +8,7 @@ export default function rowColToCellKey(row: number, col: number) {
     let columnLetter = '';
 
     while (true) {
-        columnLetter = String.fromCharCode(letterACode + (col % 26)) + columnLetter;
+        columnLetter = String.fromCharCode(char_A + (col % 26)) + columnLetter;
         if (col < 26)
             break;
         col = Math.floor(col / 26) - 1;

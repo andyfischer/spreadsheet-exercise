@@ -1,5 +1,6 @@
 
 import rowColToCellKey from './rowColToCellKey'
+import parseExpression, { AST, Literal, Ref, Expression } from './parseExpression'
 
 export interface Cell {
     key: string
@@ -24,6 +25,20 @@ export default class SpreadsheetModel {
         return this.sourceValues.get(cellkey);
     }
 
+    evaluateExpression(ast: AST) {
+        switch (ast.type) {
+            case 'literal':
+                return parseInt(ast.literal, 10);
+
+            case 'ref':
+                return this.getDerived(ast.ref);
+
+            case 'expression':
+                return ast.callback(this.evaluateExpression(ast.left),
+                                    this.evaluateExpression(ast.right));
+        }
+    }
+
     getDerived(cellkey: string) {
         let derived = this.derivedValues.get(cellkey);
         if (derived != null)
@@ -32,9 +47,13 @@ export default class SpreadsheetModel {
         // Need to compute the derived value.
         const source = this.sourceValues.get(cellkey);
 
-        // TODO: Check if this is an expression
+        // Check if this is an expression
+        if (source[0] === '=') {
+            derived = parseExpression(source.slice(1));
+        } else {
+            derived = source;
+        }
 
-        derived = source;
         this.derivedValues.set(cellkey, derived);
         return derived;
     }

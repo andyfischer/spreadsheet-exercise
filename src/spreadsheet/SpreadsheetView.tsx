@@ -43,7 +43,7 @@ export default function SpreadsheetView({model}: Props) {
         if (cell.key === editingCellKey) {
             // This cell is currently being edited
             return <EditingCell
-                cellkey={cell.key}
+                key={cell.key}
                 value={inProgressValue as string}
                 onChange={(val) => setInProgressValue(val)}
                 onSubmit={submitCurrentEdit}
