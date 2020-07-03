@@ -6,7 +6,7 @@ export default function initializeSpreadsheet({useLocalStorage}: {useLocalStorag
     const defaultRowCount = 4;
     const model = new SpreadsheetModel(defaultColumnCount, defaultRowCount);
     model.resetToFakeData();
-    model.tryLoadFromLocalStorage();
-    model.saveToLocalStorage = true;
+    // model.tryLoadFromLocalStorage();
+    // model.saveToLocalStorage = true;
     return model;
 }
